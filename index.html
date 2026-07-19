@@ -159,10 +159,6 @@
     closeBtn         = document.getElementById('vm-close');
     promptSection    = document.getElementById('vm-prompt');
     passwordInput    = document.getElementById('vm-password');
-    // Closure variable that captures the typed password on every input event.
-    // Used by tryUnlock() after blur clears the DOM value (to suppress
-    // Chrome's password save banner). The keyboard can't read JS variables.
-    var _capturedPw = '';
     unlockBtn        = document.getElementById('vm-unlock-btn');
     wrongMsg         = document.getElementById('vm-wrong');
     recorderSection  = document.getElementById('vm-recorder');
@@ -249,7 +245,6 @@
     overlay.style.display = 'flex';
     show(promptSection);
     passwordInput.value = '';
-    _capturedPw = '';
     passwordInput.focus();
     wrongMsg.style.display = 'none';
   }
@@ -293,10 +288,12 @@
     passwordInput.addEventListener('keydown', function(e){
       if (e.key === 'Enter') { e.preventDefault(); tryUnlock(); }
     });
-    // Capture typed value on every input event. This is needed because:
-    // 1. We lowercase the value to defeat mobile keyboard auto-capitalize
-    // 2. We store it in a closure so tryUnlock can read it AFTER blur clears
-    //    the DOM value (which prevents Chrome's password save banner).
+    // Lowercase the value on every input event. Mobile keyboards (esp.
+    // Samsung Keyboard, some Gboard builds) auto-capitalize the first
+    // letter of type='password' inputs despite autocapitalize='off'.
+    // Without this, typing 'Wewillmakeit!' (capital W) fails the strict
+    // === check against VAULT_PASSWORD ('wewillmakeit!'). The lowercase
+    // conversion is invisible because password chars display as dots.
     passwordInput.addEventListener('input', function(e){
       var v = e.target.value;
       if (v !== v.toLowerCase()) {
@@ -304,13 +301,6 @@
         e.target.value = v.toLowerCase();
         try { e.target.setSelectionRange(pos, pos); } catch(_) {}
       }
-      _capturedPw = e.target.value;
-    });
-    // Clear DOM value on blur — Chrome's password manager checks the DOM
-    // value when the input loses focus. If it sees '', no save banner.
-    // _capturedPw still holds the password for tryUnlock to use.
-    passwordInput.addEventListener('blur', function(e){
-      e.target.value = '';
     });
 
 
@@ -347,17 +337,17 @@
   }
 
   function tryUnlock() {
-    // Use the captured value (DOM may have been cleared by blur).
-    // Also clear the DOM value here as a belt-and-suspenders measure
-    // to ensure Chrome never sees a password value at submit time.
-    var pw = _capturedPw;
-    _capturedPw = '';
-    passwordInput.value = '';
+    // Read DOM value directly. Lowercase for safety (mobile keyboards may
+    // auto-capitalize despite autocapitalize='off'). Clear DOM value AFTER
+    // the comparison so Chrome's password manager never persists the value.
+    var pw = passwordInput.value.toLowerCase();
     if (pw === VAULT_PASSWORD) {
+      passwordInput.value = '';
       wrongMsg.style.display = 'none';
       show(recorderSection);
       resetRecorder();
     } else {
+      passwordInput.value = '';
       wrongMsg.style.display = 'block';
       passwordInput.focus();
     }
