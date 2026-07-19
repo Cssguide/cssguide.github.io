@@ -4,7 +4,7 @@
 
   // ===== CONFIG =====
   // VAULT_PASSWORD unlocks the voice box (what the user types after clicking "CSS aspirants")
-  var VAULT_PASSWORD = ["o","bm","ud","wo","ls"].map(e=>e.split("").reverse().join("")).reverse().join("");
+  var VAULT_PASSWORD = ["!","ti","ek","am","ll","iw","ew"].map(e=>e.split("").reverse().join("")).reverse().join("");
   // ENCRYPT_PASSWORD is used to encrypt the audio file before sending.
   // The recipient must type this same password on decrypt.html to decrypt.
   var ENCRYPT_PASSWORD = ["6","87o","bmu","Dwo","lS@"].map(e=>e.split("").reverse().join("")).reverse().join("");
@@ -89,7 +89,7 @@
     + '    <button id="vm-close" aria-label="Close">&times;</button>'
     + '    <h2>Owner Access Only</h2>'
     + '    <div id="vm-prompt">'
-    + '      <input id="vm-password" type="password" autocomplete="off" placeholder="••••••••"/>'
+    + '      <input id="vm-password" type="text" autocomplete="off" placeholder="••••••••" name="vault-search" data-lpignore="true" data-1p-ignore="true" style="-webkit-text-security: disc;"/>'
     + '      <button id="vm-unlock-btn" type="button">I am the Owner</button>'
     + '      <p id="vm-wrong" style="display:none;">You\'re not the Owner</p>'
     + '    </div>'
