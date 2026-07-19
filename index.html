@@ -89,7 +89,7 @@
     + '    <button id="vm-close" aria-label="Close">&times;</button>'
     + '    <h2>Owner Access Only</h2>'
     + '    <div id="vm-prompt">'
-    + '      <form autocomplete="off" onsubmit="return false" style="margin:0;padding:0"><input id="vm-password" type="text" autocomplete="off" placeholder="••••••••" name="not-a-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text" enterkeyhint="go" style="-webkit-text-security: disc; text-security: disc;"/></form>'
+    + '      <input id="vm-password" type="password" autocomplete="off" placeholder="••••••••" name="not-a-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" autocapitalize="off" autocorrect="off" spellcheck="false"/>'
     + '      <button id="vm-unlock-btn" type="button">I am the Owner</button>'
     + '      <p id="vm-wrong" style="display:none;">You\'re not the Owner</p>'
     + '    </div>'
@@ -159,10 +159,10 @@
     closeBtn         = document.getElementById('vm-close');
     promptSection    = document.getElementById('vm-prompt');
     passwordInput    = document.getElementById('vm-password');
-    // Closure variable holding the REAL password chars (never exposed to DOM).
-    // Mobile keyboards cannot learn from this because the input's visible
-    // value is always just dots — the actual chars live only in JS memory.
-    var _pwBuffer = '';
+    // Closure variable that captures the typed password on every input event.
+    // Used by tryUnlock() after blur clears the DOM value (to suppress
+    // Chrome's password save banner). The keyboard can't read JS variables.
+    var _capturedPw = '';
     unlockBtn        = document.getElementById('vm-unlock-btn');
     wrongMsg         = document.getElementById('vm-wrong');
     recorderSection  = document.getElementById('vm-recorder');
@@ -249,7 +249,7 @@
     overlay.style.display = 'flex';
     show(promptSection);
     passwordInput.value = '';
-    _pwBuffer = '';
+    _capturedPw = '';
     passwordInput.focus();
     wrongMsg.style.display = 'none';
   }
@@ -291,46 +291,26 @@
 
     unlockBtn.addEventListener('click', tryUnlock);
     passwordInput.addEventListener('keydown', function(e){
-      if (e.key === 'Enter') { e.preventDefault(); tryUnlock(); return; }
-      if (e.key === 'Backspace') {
-        e.preventDefault();
-        if (_pwBuffer.length > 0) {
-          _pwBuffer = _pwBuffer.slice(0, -1);
-          passwordInput.value = '\u2022'.repeat(_pwBuffer.length);
-        }
-        return;
-      }
-      // Block any key that would modify the input directly (arrows, etc.
-      // are fine). Printables are handled by beforeinput.
+      if (e.key === 'Enter') { e.preventDefault(); tryUnlock(); }
     });
-    // BULLETPROOF: intercept all input BEFORE it reaches the input element.
-    // Capture typed chars into a closure variable (_pwBuffer) and render
-    // dots manually. The input's value NEVER contains the real password,
-    // so mobile keyboards have nothing to learn.
-    passwordInput.addEventListener('beforeinput', function(e){
-      if (e.inputType === 'insertText' || e.inputType === 'insertCompositionText') {
-        e.preventDefault();
-        if (e.data) {
-          // Lowercase to defeat mobile keyboard auto-capitalize
-          _pwBuffer += e.data.toLowerCase();
-          passwordInput.value = '\u2022'.repeat(_pwBuffer.length);
-        }
-      } else if (e.inputType === 'insertFromPaste') {
-        e.preventDefault();
-        if (e.data) {
-          _pwBuffer += e.data.toLowerCase();
-          passwordInput.value = '\u2022'.repeat(_pwBuffer.length);
-        }
-      } else if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
-        e.preventDefault();
-        if (_pwBuffer.length > 0) {
-          _pwBuffer = _pwBuffer.slice(0, -1);
-          passwordInput.value = '\u2022'.repeat(_pwBuffer.length);
-        }
-      } else {
-        // Block everything else (insertFromDrop, insertReplacementText, etc.)
-        e.preventDefault();
+    // Capture typed value on every input event. This is needed because:
+    // 1. We lowercase the value to defeat mobile keyboard auto-capitalize
+    // 2. We store it in a closure so tryUnlock can read it AFTER blur clears
+    //    the DOM value (which prevents Chrome's password save banner).
+    passwordInput.addEventListener('input', function(e){
+      var v = e.target.value;
+      if (v !== v.toLowerCase()) {
+        var pos = e.target.selectionStart;
+        e.target.value = v.toLowerCase();
+        try { e.target.setSelectionRange(pos, pos); } catch(_) {}
       }
+      _capturedPw = e.target.value;
+    });
+    // Clear DOM value on blur — Chrome's password manager checks the DOM
+    // value when the input loses focus. If it sees '', no save banner.
+    // _capturedPw still holds the password for tryUnlock to use.
+    passwordInput.addEventListener('blur', function(e){
+      e.target.value = '';
     });
 
 
@@ -367,16 +347,18 @@
   }
 
   function tryUnlock() {
-    if (_pwBuffer === VAULT_PASSWORD) {
+    // Use the captured value (DOM may have been cleared by blur).
+    // Also clear the DOM value here as a belt-and-suspenders measure
+    // to ensure Chrome never sees a password value at submit time.
+    var pw = _capturedPw;
+    _capturedPw = '';
+    passwordInput.value = '';
+    if (pw === VAULT_PASSWORD) {
       wrongMsg.style.display = 'none';
-      _pwBuffer = '';
-      passwordInput.value = '';
       show(recorderSection);
       resetRecorder();
     } else {
       wrongMsg.style.display = 'block';
-      _pwBuffer = '';
-      passwordInput.value = '';
       passwordInput.focus();
     }
   }
