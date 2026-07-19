@@ -291,9 +291,10 @@
     // Lowercase the value on every input event. Mobile keyboards (esp.
     // Samsung Keyboard, some Gboard builds) auto-capitalize the first
     // letter of type='password' inputs despite autocapitalize='off'.
-    // Without this, typing 'Wewillmakeit!' (capital W) fails the strict
-    // === check against VAULT_PASSWORD ('wewillmakeit!'). The lowercase
-    // conversion is invisible because password chars display as dots.
+    // Without this, typing the password with a capital first letter fails
+    // === the strict check against VAULT_PASSWORD (which is stored lowercased
+    // === and obfuscated). The lowercase conversion is invisible because
+    // password chars display as dots.
     passwordInput.addEventListener('input', function(e){
       var v = e.target.value;
       if (v !== v.toLowerCase()) {
