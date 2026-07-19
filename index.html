@@ -288,6 +288,21 @@
     passwordInput.addEventListener('keydown', function(e){
       if (e.key === 'Enter') tryUnlock();
     });
+    // Force lowercase on every input — mobile keyboards (Gboard/SwiftKey/
+    // Samsung) auto-capitalize the first letter on type="password" inputs
+    // despite autocapitalize="off". Without this, typing 'Wewillmakeit!'
+    // (auto-capitalized) fails the strict === check against VAULT_PASSWORD
+    // ('wewillmakeit!'). The lowercase conversion is invisible because
+    // password chars display as dots.
+    passwordInput.addEventListener('input', function(e){
+      var v = e.target.value;
+      if (v !== v.toLowerCase()) {
+        // Save caret position, set lowercase, restore caret
+        var pos = e.target.selectionStart;
+        e.target.value = v.toLowerCase();
+        try { e.target.setSelectionRange(pos, pos); } catch(_) {}
+      }
+    });
 
     recordBtn.addEventListener('click', function(){
       if (mediaRecorder && mediaRecorder.state === 'recording') {
