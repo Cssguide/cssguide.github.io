@@ -932,6 +932,10 @@
     if (!pack) return;
     var fullUrl = getStickerUrl(pack, index, false);
 
+    // Preload the full-size sticker image so it renders instantly in the message
+    var preloader = new Image();
+    preloader.src = fullUrl;
+
     var msg = {
       id: 'stk_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
       type: 'sticker',
@@ -1371,7 +1375,7 @@
         stickerImgUrl = getStickerUrl(stickerPack, msg.stickerIndex, false);
       }
       div.innerHTML =
-        '<img class="msg-sticker-img" src="' + stickerImgUrl + '" alt="' + stickerPackLabel + ' sticker" loading="lazy" onerror="this.style.display=\'none\'"/>' +
+        '<img class="msg-sticker-img" src="' + stickerImgUrl + '" alt="' + stickerPackLabel + ' sticker" onerror="this.style.display=\'none\'"/>' +
         '<div class="msg-time">' + formatTime12(msg.ts) + ' ' + ticksHtml + '</div>';
     } else {
       var senderLabel = isSent ? '' : '<div class="msg-sender">' + (msg.sender === 'dumbi' ? 'Dumbi' : 'Dumbo') + '</div>';
