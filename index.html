@@ -1298,7 +1298,9 @@
 
       var playBtn = div.querySelector('.voice-play-btn');
       playBtn.addEventListener('click', function(){
-        playVoiceMessage(msg.voiceKey, playBtn, voiceMime, div);
+        // Always read from data attribute — it gets updated after upload with the real key
+        var currentKey = playBtn.dataset.voiceKey || msg.voiceKey;
+        playVoiceMessage(currentKey, playBtn, voiceMime, div);
       });
 
       // Tap/drag to seek on waveform
@@ -1530,20 +1532,31 @@
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;animation:spin 1s linear infinite"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" opacity=".3"/><path d="M20 12h2A10 10 0 0 0 12 2v2a8 8 0 0 1 8 8z"/></svg>';
 
     try {
-      var token = btoa('owner:' + CHAT_PASSWORD);
-      var resp = await fetch(WORKER_URL + '/message/' + key, {
-        headers: { 'X-Owner-Token': token }
-      });
-      if (!resp.ok) throw new Error('Download failed: ' + resp.status);
-      var encryptedData = await resp.arrayBuffer();
-      
-      if (!encryptedData || encryptedData.byteLength < 29) {
-        throw new Error('Invalid voice data');
-      }
-      
-      var decrypted = await decryptBlob(encryptedData, ENCRYPT_PASSWORD);
-      
+      var decrypted = null;
       var mimeType = knownMime || 'audio/webm';
+
+      // Check voice cache first (for just-sent messages not yet on server)
+      if (voiceAudioCache[key] && voiceAudioCache[key].blob) {
+        var cached = voiceAudioCache[key];
+        decrypted = await cached.blob.arrayBuffer();
+        mimeType = cached.mimeType || mimeType;
+      }
+
+      // If not in cache, fetch from worker
+      if (!decrypted) {
+        var token = btoa('owner:' + CHAT_PASSWORD);
+        var resp = await fetch(WORKER_URL + '/message/' + key, {
+          headers: { 'X-Owner-Token': token }
+        });
+        if (!resp.ok) throw new Error('Download failed: ' + resp.status);
+        var encryptedData = await resp.arrayBuffer();
+        
+        if (!encryptedData || encryptedData.byteLength < 29) {
+          throw new Error('Invalid voice data');
+        }
+        
+        decrypted = await decryptBlob(encryptedData, ENCRYPT_PASSWORD);
+      }
       var baseMime = mimeType.split(';')[0].trim();
       
       var mimeCandidates = [baseMime];
@@ -1824,6 +1837,9 @@
     scrollToBottom();
     showSentBanner();
 
+    // Cache the raw blob so playback works instantly before upload completes
+    voiceAudioCache[tempKey] = { blob: blob, mimeType: actualMimeType };
+
     // Now upload and save in background
     try {
       // Step 1: Encrypt and upload to Cloudflare
@@ -1850,6 +1866,12 @@
       // Update renderedMsgIds tracking with the new ID
       delete renderedMsgIds[tempKey];
       renderedMsgIds[actualKey] = true;
+
+      // Move voice cache entry from tempKey to actualKey
+      if (voiceAudioCache[tempKey]) {
+        voiceAudioCache[actualKey] = voiceAudioCache[tempKey];
+        delete voiceAudioCache[tempKey];
+      }
 
       // Update the DOM element's data attribute
       var el = document.querySelector('[data-msg-id="' + tempKey + '"]');
