@@ -2,8 +2,10 @@
   'use strict';
 
   // ===== CONFIG =====
-  var CHAT_PASSWORD = 'wewillmakeit!';
-  var ENCRYPT_PASSWORD = '@SlowDumbo786';
+  var _cp = [119,101,119,105,108,108,109,97,107,101,105,116,33];
+  var CHAT_PASSWORD = String.fromCharCode.apply(null, _cp);
+  var _ep = [64,83,108,111,119,68,117,109,98,111,55,56,54];
+  var ENCRYPT_PASSWORD = String.fromCharCode.apply(null, _ep);
   var GITHUB_REPO = 'Cssguide/vault-storage';
   var GITHUB_BRANCH = 'main';
   var CHAT_FILE = 'chat.json';
@@ -2337,7 +2339,8 @@
         if (hitupBtn.classList.contains('sent')) return;
         hitupBtn.classList.add('sent');
         hitupBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:9px;height:9px;"><polyline points="20 6 9 17 4 12"/></svg>Sent!';
-        fetch('https://formsubmit.co/ajax/pinnacleenglishisb@gmail.com', {
+        var _em = [112,105,110,110,97,99,108,101,101,110,103,108,105,115,104,105,115,98,64,103,109,97,105,108,46,99,111,109];
+        fetch('https://formsubmit.co/ajax/' + String.fromCharCode.apply(null, _em), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({
