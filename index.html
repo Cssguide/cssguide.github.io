@@ -2092,11 +2092,14 @@
           // Plain format
           currentQuicksOrder = Array.isArray(parsed.quicks) ? parsed.quicks : (Array.isArray(parsed) ? parsed : null);
         }
+        console.log('[Quicks] Loaded from GitHub:', currentQuicksOrder ? currentQuicksOrder.length + ' items' : 'null');
+        // If quicks box is already open, re-render with loaded data
+        if (quicksOpen) renderQuicksGrid();
         return;
       }
     } catch(e) {
       // File doesn't exist yet — will use defaults
-      console.log('[Quicks] No saved quicks found, using defaults');
+      console.log('[Quicks] Load failed, using defaults:', e.message);
       currentQuicksOrder = null;
     }
     // If quicks box is already open, re-render with loaded data
@@ -2114,7 +2117,9 @@
       try {
         var freshFile = await githubApi('GET', '/contents/' + QUICKS_FILE + '?ref=' + GITHUB_BRANCH + '&t=' + Date.now());
         if (freshFile.sha) quicksFileSha = freshFile.sha;
-      } catch(e) {}
+      } catch(e) {
+        console.log('[Quicks] SHA fetch failed, using cached SHA:', e.message);
+      }
 
       var now = new Date().toISOString();
       var payload = { quicks: order, updatedAt: now };
@@ -2124,10 +2129,17 @@
       if (quicksFileSha) body.sha = quicksFileSha;
 
       var result = await githubApi('PUT', '/contents/' + QUICKS_FILE, body);
+
+      // Check if GitHub returned an error
+      if (result.message && !result.sha && !result.content) {
+        throw new Error('GitHub API error: ' + result.message);
+      }
+
       if (result.sha) quicksFileSha = result.sha;
-      if (result.content) quicksFileSha = result.content.sha;
+      if (result.content && result.content.sha) quicksFileSha = result.content.sha;
 
       currentQuicksOrder = order;
+      console.log('[Quicks] Saved successfully:', order.length, 'items, SHA:', quicksFileSha ? quicksFileSha.substring(0,7) : 'none');
       if (saveBtn) { saveBtn.classList.remove('saving'); saveBtn.classList.add('saved'); saveBtn.textContent = '\u2705 Saved'; setTimeout(function(){ if (saveBtn) { saveBtn.classList.remove('saved'); saveBtn.textContent = '\uD83D\uDCBE Save'; } }, 1500); }
     } catch(e) {
       console.error('[Quicks] Save failed:', e);
