@@ -1542,6 +1542,20 @@
         mimeType = cached.mimeType || mimeType;
       }
 
+      // Fallback: if key missed cache, try matching by DOM element (key mismatch after upload)
+      if (!decrypted && msgDiv) {
+        var allCacheKeys = Object.keys(voiceAudioCache);
+        for (var ci = 0; ci < allCacheKeys.length; ci++) {
+          var ck = allCacheKeys[ci];
+          if (voiceAudioCache[ck] && voiceAudioCache[ck].blob && voiceAudioCache[ck]._msgDiv === msgDiv) {
+            decrypted = await voiceAudioCache[ck].blob.arrayBuffer();
+            mimeType = voiceAudioCache[ck].mimeType || mimeType;
+            key = ck; // Use the working key for Worker fallback if needed
+            break;
+          }
+        }
+      }
+
       // If not in cache, fetch from worker
       if (!decrypted) {
         var token = btoa('owner:' + CHAT_PASSWORD);
@@ -1838,7 +1852,8 @@
     showSentBanner();
 
     // Cache the raw blob so playback works instantly before upload completes
-    voiceAudioCache[tempKey] = { blob: blob, mimeType: actualMimeType };
+    var _voiceEl = document.querySelector('[data-msg-id="' + tempKey + '"]');
+    voiceAudioCache[tempKey] = { blob: blob, mimeType: actualMimeType, _msgDiv: _voiceEl };
 
     // Now upload and save in background
     try {
@@ -1867,10 +1882,10 @@
       delete renderedMsgIds[tempKey];
       renderedMsgIds[actualKey] = true;
 
-      // Move voice cache entry from tempKey to actualKey
+      // Copy voice cache entry from tempKey to actualKey (keep BOTH keys so playback works with either)
       if (voiceAudioCache[tempKey]) {
         voiceAudioCache[actualKey] = voiceAudioCache[tempKey];
-        delete voiceAudioCache[tempKey];
+        // Keep voiceAudioCache[tempKey] too — playBtn may still reference it until DOM update completes
       }
 
       // Update the DOM element's data attribute
