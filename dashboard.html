@@ -193,6 +193,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     </div>
     <div id="text-list"><div class="loading"><div class="spinner"></div>Loading text messages...</div></div>
   </div>
+
+  <!-- Sticker Messages -->
+  <div class="section" id="sticker-section">
+    <div class="section-head">
+      <h2>&#127912; Stickers <span class="badge" id="sticker-count">0</span></h2>
+      <div class="section-btns">
+        <button class="delete-all-btn" id="delete-all-sticker-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">Delete All Stickers</button>
+      </div>
+    </div>
+    <div id="sticker-list"><div class="loading"><div class="spinner"></div>Loading stickers...</div></div>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -229,6 +240,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   var chatFileSha = null;
   var voiceMessages = [];
   var textMessages = [];
+  var stickerMessages = [];
 
   // ===== CALCULATED WRITE COUNTER STATE =====
   // Seeds from Cloudflare GraphQL (actual writes) then adds precise operation costs.
@@ -294,6 +306,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   var textList = document.getElementById('text-list');
   var textCountBadge = document.getElementById('text-count');
   var deleteAllTextBtn = document.getElementById('delete-all-text-btn');
+  var stickerList = document.getElementById('sticker-list');
+  var stickerCountBadge = document.getElementById('sticker-count');
+  var deleteAllStickerBtn = document.getElementById('delete-all-sticker-btn');
   var toastEl = document.getElementById('toast');
   var confirmOverlay = document.getElementById('confirm-overlay');
   // Calculated write counter DOM
@@ -336,6 +351,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     fetchWriteCount();
     loadVoiceMessages();
     loadTextMessages();
+    loadStickerMessages();
     // Initialize calculated write counter display
     updateCalcWriteCount();
   }
@@ -831,6 +847,90 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       showToast('Failed: ' + e.message, 'error');
       deleteAllTextBtn.disabled = false;
       deleteAllTextBtn.textContent = 'Delete All Text';
+    }
+  }
+
+  // ===== STICKER MESSAGES =====
+  async function loadStickerMessages(){
+    stickerList.innerHTML = '<div class="loading"><div class="spinner"></div>Loading stickers...</div>';
+    try {
+      var data = await githubApi('GET', '/contents/' + CHAT_FILE + '?ref=' + GITHUB_BRANCH + '&t=' + Date.now());
+      if(data.sha) chatFileSha = data.sha;
+      if(data.content){
+        var chatData = await parseChatContent(data.content);
+        var now = Date.now();
+        var allMsgs = (chatData.messages || []).filter(function(m){ return (now - m.ts) < AUTO_DELETE_MS; });
+        stickerMessages = allMsgs.filter(function(m){ return m.type === 'sticker'; });
+        stickerCountBadge.textContent = stickerMessages.length;
+        renderStickerMessages();
+      } else {
+        stickerMessages = [];
+        stickerCountBadge.textContent = '0';
+        renderStickerMessages();
+      }
+    } catch(e){
+      stickerList.innerHTML = '<div class="txt-section-empty">Failed to load stickers</div>';
+    }
+  }
+
+  function renderStickerMessages(){
+    if(stickerMessages.length === 0){
+      stickerList.innerHTML = '<div class="txt-section-empty">No sticker messages</div>';
+      deleteAllStickerBtn.disabled = true;
+      return;
+    }
+    deleteAllStickerBtn.disabled = false;
+    var html = '';
+    stickerMessages.forEach(function(msg){
+      var sender = msg.sender || 'unknown';
+      var packLabel = msg.stickerPack || 'unknown';
+      var stickerUrl = msg.stickerUrl || '';
+      var timeStr = msg.ts ? formatTime(new Date(msg.ts).toISOString()) : '';
+      html += '<div class="vmsg-card">'
+        + '<div class="vmsg-icon" style="background:linear-gradient(135deg,#2a1f3e,#1e1530);overflow:hidden;padding:0;">'
+        + (stickerUrl ? '<img src="' + escapeAttr(stickerUrl) + '" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" onerror="this.style.display=\'none\'"/>' : '&#127912;')
+        + '</div>'
+        + '<div class="vmsg-info">'
+        + '<div class="vmsg-sender">' + escapeHtml(sender) + ' &middot; ' + escapeHtml(packLabel) + '</div>'
+        + (timeStr ? '<div class="vmsg-meta"><span class="vmsg-time">' + timeStr + '</span></div>' : '')
+        + '</div></div>';
+    });
+    stickerList.innerHTML = html;
+  }
+
+  deleteAllStickerBtn.addEventListener('click', function(){
+    if(stickerMessages.length === 0) return;
+    showConfirm('Delete All Stickers', 'This will permanently delete all ' + stickerMessages.length + ' sticker messages. Text and voice messages will NOT be affected. This action cannot be undone.', function(){
+      doDeleteAllStickers();
+    });
+  });
+
+  async function doDeleteAllStickers(){
+    deleteAllStickerBtn.disabled = true;
+    deleteAllStickerBtn.textContent = 'Deleting...';
+    try {
+      var fresh = await githubApi('GET', '/contents/' + CHAT_FILE + '?ref=' + GITHUB_BRANCH + '&t=' + Date.now());
+      if(fresh.sha) chatFileSha = fresh.sha;
+      if(!fresh.content) throw new Error('No chat file');
+
+      var chatData = await parseChatContent(fresh.content);
+      var now = Date.now();
+      var allMsgs = (chatData.messages || []).filter(function(m){ return (now - m.ts) < AUTO_DELETE_MS; });
+      var remaining = allMsgs.filter(function(m){ return m.type !== 'sticker'; });
+
+      var saved = await saveChatToGitHub(remaining);
+      if(saved){
+        showToast('All ' + stickerMessages.length + ' stickers deleted', 'success');
+        stickerMessages = [];
+        stickerCountBadge.textContent = '0';
+        renderStickerMessages();
+      } else {
+        throw new Error('Save failed');
+      }
+    } catch(e){
+      showToast('Failed: ' + e.message, 'error');
+      deleteAllStickerBtn.disabled = false;
+      deleteAllStickerBtn.textContent = 'Delete All Stickers';
     }
   }
 
