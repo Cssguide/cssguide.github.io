@@ -356,7 +356,7 @@
     + '      <div class="role-options">'
     + '        <button class="role-btn dumbi-btn" data-role="dumbi" type="button">'
     + '          <span class="role-icon">\uD83D\uDC78\uD83C\uDFFB</span>'
-    + '          <span class="role-name">Dumbi</span>'
+    + '          <span class="role-name">Goharam</span>'
     + '          <span class="role-label">Princess Mode</span>'
     + '        </button>'
     + '        <button class="role-btn dumbo-btn" data-role="dumbo" type="button">'
@@ -375,7 +375,7 @@
     + '        <div class="chat-header-avatar" id="chat-avatar" style="background:#252a35;">\uD83E\uDDD1\uD83C\uDFFB\u200D\uD83D\uDCBB</div>'
     + '        <div class="chat-header-info">'
     + '          <div class="chat-header-name" id="chat-header-name">CSS Aspirants</div>'
-    + '          <div class="chat-header-status"><span id="chat-header-status">Messages auto-delete in 24h</span></div>'
+    + '          <div class="chat-header-status"><span id="chat-header-status"></span></div>'
     + '        </div>'
     // write-count HTML removed — moved to private dashboard
     + '        <button class="hitup-btn" id="hitup-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>Hit Up</button>'
@@ -421,7 +421,7 @@
     + '      <div class="chat-input-area">'
     + '        <div class="presence-bubbles">'
     + '          <div class="presence-bubble dumbo-bub" id="presence-dumbo" title="Dumbo"></div>'
-    + '          <div class="presence-bubble dumbi-bub" id="presence-dumbi" title="Dumbi"></div>'
+    + '          <div class="presence-bubble dumbi-bub" id="presence-dumbi" title="Goharam"></div>'
     + '        </div>'
     + '        <input id="chat-input" type="text" autocomplete="off" placeholder="Type a message..."/>'
     + '        <button class="chat-sticker-btn" id="chat-sticker-btn" type="button">😊</button>'
@@ -660,7 +660,7 @@
     var dumboBubble = document.getElementById('presence-dumbo');
     if (!dumbiBubble || !dumboBubble) return;
 
-    // Update Dumbi bubble
+    // Update Goharam bubble
     dumbiBubble.classList.remove('online', 'typing');
     if (dumbiStatus.typing) {
       dumbiBubble.classList.add('typing');
@@ -1105,7 +1105,7 @@
     // Show empty state ONLY if no messages rendered at all AND no locally sent messages pending
     var hasAnyLocalMessages = Object.keys(locallySentIds).length > 0;
     if (Object.keys(renderedMsgIds).length === 0 && newMsgs.length === 0 && !hasAnyLocalMessages) {
-      messagesContainer.innerHTML = '<div style="text-align:center;padding:40px 20px;"><div style="font-size:32px;margin-bottom:8px;">\uD83D\uDD12</div><div style="font-size:12px;color:#555c6e;">End-to-end encrypted</div><div style="font-size:10px;color:#3a3f4a;margin-top:4px;">Messages auto-delete after 24 hours</div></div>';
+      messagesContainer.innerHTML = '<div style="text-align:center;padding:40px 20px;"><div style="font-size:32px;margin-bottom:8px;">\uD83D\uDD12</div><div style="font-size:12px;color:#555c6e;">End-to-end encrypted</div></div>';
       return;
     }
 
@@ -1382,7 +1382,7 @@
         '<img class="msg-sticker-img" src="' + stickerImgUrl + '" alt="' + stickerPackLabel + ' sticker" onerror="this.style.display=\'none\'"/>' +
         '<div class="msg-time">' + formatTime12(msg.ts) + ' ' + ticksHtml + '</div>';
     } else {
-      var senderLabel = isSent ? '' : '<div class="msg-sender">' + (msg.sender === 'dumbi' ? 'Dumbi' : 'Dumbo') + '</div>';
+      var senderLabel = isSent ? '' : '<div class="msg-sender">' + (msg.sender === 'dumbi' ? 'Goharam' : 'Dumbo') + '</div>';
       div.innerHTML =
         senderLabel +
         escapeHtml(msg.text) +
@@ -2568,13 +2568,13 @@
     if (myRole === 'dumbi') {
       avatarEl.innerHTML = '\uD83D\uDC78\uD83C\uDFFB';
       avatarEl.style.background = '#1e2a25';
-      if (headerRole) headerRole.textContent = 'Dumbi \u2192 Dumbo';
+      if (headerRole) headerRole.textContent = 'Goharam \u2192 Dumbo';
     } else {
       avatarEl.innerHTML = '\uD83E\uDDD1\uD83C\uDFFB\u200D\uD83D\uDCBB';
       avatarEl.style.background = '#252a35';
-      if (headerRole) headerRole.textContent = 'Dumbo \u2192 Dumbi';
+      if (headerRole) headerRole.textContent = 'Dumbo \u2192 Goharam';
     }
-    if (headerStatus) headerStatus.textContent = 'Messages auto-delete in 24h';
+    if (headerStatus) headerStatus.textContent = '';
 
     // FORCE FULL RE-RENDER: Clear all stale DOM and tracking state
     // This prevents messages rendered with a previous (or null) myRole from staying
