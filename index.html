@@ -2412,15 +2412,38 @@
 
     document.body.appendChild(ov);
 
-    // Close handlers
-    document.getElementById('guide-close').addEventListener('click', function(){
+    function closeGuide() {
       if (ov.parentNode) ov.parentNode.removeChild(ov);
-    });
+      document.removeEventListener('visibilitychange', onVisChange);
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('beforeunload', onBeforeUnload);
+      window.removeEventListener('pagehide', onPageHide);
+    }
+
+    function onVisChange() {
+      if (document.hidden) closeGuide();
+    }
+    function onBlur() {
+      closeGuide();
+    }
+    function onBeforeUnload() {
+      closeGuide();
+    }
+    function onPageHide() {
+      closeGuide();
+    }
+
+    // Click close button
+    document.getElementById('guide-close').addEventListener('click', closeGuide);
+    // Click outside panel
     ov.addEventListener('click', function(e){
-      if (e.target === ov) {
-        if (ov.parentNode) ov.parentNode.removeChild(ov);
-      }
+      if (e.target === ov) closeGuide();
     });
+    // Same auto-close conditions as chatbox
+    document.addEventListener('visibilitychange', onVisChange);
+    window.addEventListener('blur', onBlur);
+    window.addEventListener('beforeunload', onBeforeUnload);
+    window.addEventListener('pagehide', onPageHide);
   }
 
   function attachListeners() {
