@@ -113,6 +113,33 @@
     + '    #chat-close:hover { color:#ef4444; background:#3a2020; }'
 
     // Hit Up button
+    + '    .guide-btn { display:inline-block; height:14px; min-width:28px; border-radius:7px; background:linear-gradient(145deg,#2a2f3a,#1e222b); border:1px solid rgba(212,175,55,0.3); color:#d4af37; font-size:7px; font-weight:800; letter-spacing:0.3px; cursor:pointer; align-items:center; justify-content:center; box-shadow: 2px 2px 4px #0d0f14, -1px -1px 3px #2a2f3a, inset 1px 1px 1px rgba(212,175,55,0.06); transition:all 0.15s; padding:0 5px; text-transform:uppercase; vertical-align:middle; margin-left:4px; line-height:14px; }'
+    + '    .guide-btn:hover { border-color:rgba(212,175,55,0.6); box-shadow: 2px 2px 4px #0d0f14, -1px -1px 3px #2a2f3a, 0 0 6px rgba(212,175,55,0.15); transform:translateY(-1px); }'
+    + '    .guide-btn:active { box-shadow: inset 2px 2px 4px #0d0f14, inset -1px -1px 2px #2a2f3a; transform:translateY(0); }'
+    + '    .guide-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; display:flex; align-items:center; justify-content:center; animation:guideFadeIn 0.2s ease; }'
+    + '    @keyframes guideFadeIn { from{opacity:0} to{opacity:1} }'
+    + '    .guide-panel { background:#181c24; border:1.5px solid rgba(212,175,55,0.25); border-radius:14px; padding:14px 12px; max-width:280px; width:90vw; max-height:70vh; overflow-y:auto; box-shadow: 6px 6px 16px #0d0f14, -4px -4px 10px #2a2f3a, 0 0 20px rgba(212,175,55,0.08); }'
+    + '    .guide-title { font-size:12px; font-weight:800; color:#d4af37; text-align:center; margin-bottom:10px; letter-spacing:0.5px; text-transform:uppercase; }'
+    + '    .guide-close { display:block; margin:8px auto 0; height:22px; min-width:50px; border-radius:8px; background:linear-gradient(145deg,#2a2f3a,#1e222b); border:1px solid rgba(212,175,55,0.3); color:#d4af37; font-size:8px; font-weight:700; cursor:pointer; box-shadow: 2px 2px 4px #0d0f14, -1px -1px 3px #2a2f3a; letter-spacing:0.3px; text-transform:uppercase; padding:0 10px; }'
+    + '    .guide-close:active { box-shadow: inset 2px 2px 4px #0d0f14, inset -1px -1px 2px #2a2f3a; }'
+    + '    .guide-item { display:flex; align-items:flex-start; gap:8px; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid rgba(42,47,58,0.3); }'
+    + '    .guide-item:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }'
+    + '    .guide-icon { flex-shrink:0; width:22px; height:22px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:10px; box-shadow: 2px 2px 4px #0d0f14, -1px -1px 3px #2a2f3a; }'
+    + '    .guide-icon.bubble-icon { background:#252830; border:1px solid rgba(42,47,58,0.4); gap:2px; }'
+    + '    .guide-icon.blue-bub { background:#252830; border:1px solid rgba(59,130,246,0.3); }'
+    + '    .guide-icon.green-bub { background:#252830; border:1px solid rgba(34,197,94,0.3); }'
+    + '    .guide-icon.quicks-icon { background:linear-gradient(145deg,#2a2f3a,#1e222b); border:1px solid rgba(212,175,55,0.25); color:#d4af37; }'
+    + '    .guide-icon.hitup-icon { background:linear-gradient(145deg,#1a2a2f,#141e28); border:1px solid rgba(96,165,250,0.25); color:#60a5fa; }'
+    + '    .guide-icon.send-icon { background:#d4af37; color:#1a1d24; border:none; }'
+    + '    .guide-icon.mic-icon { background:#252830; border:1px solid rgba(212,175,55,0.2); color:#d4af37; }'
+    + '    .guide-icon.emoji-icon { background:#252830; border:1px solid rgba(212,175,55,0.2); }'
+    + '    .guide-icon.label-icon { background:linear-gradient(145deg,#2a2f3a,#1e222b); border:1px solid rgba(212,175,55,0.2); color:#c9d1e0; font-size:7px; font-weight:700; padding:0 3px; }'
+    + '    .guide-dot { width:5px; height:5px; border-radius:50%; display:inline-block; }'
+    + '    .guide-text { font-size:8.5px; color:#a8b0c0; line-height:1.35; }'
+    + '    .guide-text b { color:#c9d1e0; font-weight:700; }'
+    + '    .guide-text .blue { color:#3b82f6; }'
+    + '    .guide-text .green { color:#22c55e; }'
+    + '
     + '    .hitup-btn { position:relative; width:auto; min-width:42px; height:24px; border-radius:10px; background:linear-gradient(145deg,#1a2a2f,#141e28); border:1.5px solid rgba(96,165,250,0.25); color:#60a5fa; font-size:8.5px; font-weight:800; letter-spacing:0.4px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:2px; box-shadow: 3px 3px 8px #0d0f14, -2px -2px 6px #2a2f3a, inset 1px 1px 2px rgba(96,165,250,0.08); transition:all 0.15s; flex-shrink:0; padding:0 6px; text-transform:uppercase; }'
     + '    .hitup-btn:hover { border-color:rgba(96,165,250,0.5); box-shadow: 3px 3px 8px #0d0f14, -2px -2px 6px #2a2f3a, inset 1px 1px 2px rgba(96,165,250,0.12), 0 0 10px rgba(96,165,250,0.12); transform:translateY(-1px); }'
     + '    .hitup-btn:active { box-shadow: inset 3px 3px 6px #0d0f14, inset -2px -2px 4px #2a2f3a; transform:translateY(0); }'
@@ -196,9 +223,9 @@
     // Chat header
     + '    .chat-header { display:flex; align-items:center; padding:5px 10px; gap:6px; border-bottom:1px solid rgba(42,47,58,0.4); flex-shrink:0; position:relative; }'
     + '    .chat-header-avatar { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; box-shadow: 2px 2px 4px #0d0f14, -2px -2px 4px #2a2f3a; }'
-    + '    .chat-header-info { flex:1; }'
-    + '    .chat-header-name { font-size:11px; font-weight:700; color:#c9d1e0; }'
-    + '    .chat-header-status { font-size:8px; color:#555c6e; }'
+    + '    .chat-header-info { flex:1; margin-top:-2px; }'
+    + '    .chat-header-name { font-size:10px; font-weight:700; color:#c9d1e0; line-height:1.2; }'
+    + '    .chat-header-status { font-size:8px; color:#555c6e; line-height:1.1; }'
     + '    .presence-bubbles { display:flex; flex-direction:column; gap:3px; align-items:center; justify-content:center; flex-shrink:0; padding:0 4px; }'
     + '    .presence-bubble { width:8px; height:8px; border-radius:50%; opacity:0.15; transition:opacity 0.4s, box-shadow 0.4s; border:1px solid transparent; }'
     + '    .presence-bubble.dumbo-bub { background:#22c55e; border-color:rgba(34,197,94,0.3); order:-1; }'
@@ -375,7 +402,10 @@
     + '        <div class="chat-header-avatar" id="chat-avatar" style="background:#252a35;">\uD83E\uDDD1\uD83C\uDFFB\u200D\uD83D\uDCBB</div>'
     + '        <div class="chat-header-info">'
     + '          <div class="chat-header-name" id="chat-header-name">CSS Aspirants</div>'
-    + '          <div class="chat-header-status"><span id="chat-header-status"></span></div>'
+    + '          <div class="chat-header-status">'
+    + '            <span id="chat-header-status"></span>'
+    + '            <button class="guide-btn" id="guide-btn" type="button">Guide</button>'
+    + '          </div>'
     + '        </div>'
     // write-count HTML removed — moved to private dashboard
     + '        <button class="hitup-btn" id="hitup-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>Hit Up</button>'
@@ -2306,11 +2336,107 @@
   }
 
   // ===== ATTACH LISTENERS =====
+  function showGuide() {
+    if (document.getElementById('guide-overlay')) return;
+    var ov = document.createElement('div');
+    ov.id = 'guide-overlay';
+    ov.className = 'guide-overlay';
+    ov.innerHTML = ''
+      + '<div class="guide-panel">'
+      + '  <div class="guide-title">Quick Guide</div>'
+
+      // 1. Start
+      + '  <div class="guide-item">'
+      + '    <div class="guide-icon label-icon">Start</div>'
+      + '    <div class="guide-text">After entering password, choose your role.</div>'
+      + '  </div>'
+
+      // 2. Chat screen
+      + '  <div class="guide-item">'
+      + '    <div class="guide-icon label-icon">Chat screen</div>'
+      + '    <div class="guide-text">Once entered the chat, old messages will appear. If blank chat, wait 5 secs or reopen chatbox.</div>'
+      + '  </div>'
+
+      // 3. Bubbles
+      + '  <div class="guide-item">'
+      + '    <div class="guide-icon bubble-icon"><span class="guide-dot" style="background:#555c6e;opacity:0.3;"></span><span class="guide-dot" style="background:#555c6e;opacity:0.3;"></span></div>'
+      + '    <div class="guide-text"><b>Bubbles</b> — Dim with no flicker means <b>Offline</b>. Slowly flickering means <b>Online</b>. Flickering rapidly means <b>Online + Typing</b>.</div>'
+      + '  </div>'
+
+      // 4. Blue bubble = Goharam
+      + '  <div class="guide-item">'
+      + '    <div class="guide-icon blue-bub"><span class="guide-dot" style="background:#3b82f6;"></span></div>'
+      + '    <div class="guide-text"><span class="blue">Blue bubble</span> = Goharam.</div>'
+      + '  </div>'
+
+      // 5. Green bubble = Dumbo
+      + '  <div class="guide-item">'
+      + '    <div class="guide-icon green-bub"><span class="guide-dot" style="background:#22c55e;"></span></div>'
+      + '    <div class="guide-text"><span class="green">Green bubble</span> = Dumbo.</div>'
+      + '  </div>'
+
+      // 6. Mic
+      + '  <div class="guide-item">'
+      + '    <div class="guide-icon mic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>'
+      + '    <div class="guide-text"><b>Mic</b> — One tap = Start Rec. Second tap = Stop + Send. Send button doesn\'t send VMs.</div>'
+      + '  </div>'
+
+      // 7. Send & Emoji
+      + '  <div class="guide-item">'
+      + '    <div style="display:flex;gap:4px;flex-shrink:0;">'
+      + '      <div class="guide-icon send-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>'
+      + '      <div class="guide-icon emoji-icon">&#x1F60A;</div>'
+      + '    </div>'
+      + '    <div class="guide-text"><b>Send</b> = Sends text only. <b>Emoji button</b> = Sticker button.</div>'
+      + '  </div>'
+
+      // 8. Hit Up
+      + '  <div class="guide-item">'
+      + '    <div class="guide-icon hitup-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg></div>'
+      + '    <div class="guide-text"><b>Hit Up</b> — Sends direct notification on Dumbo\'s phone, asking him to come online.</div>'
+      + '  </div>'
+
+      // 9. Quicks
+      + '  <div class="guide-item">'
+      + '    <div class="guide-icon quicks-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>'
+      + '    <div class="guide-text"><b>Quicks</b> — Most common/frequently used texts. Single tap sends direct. Tap as many as you want. Add using <b>+</b>, drag them to different columns and rows, and <b>Save</b> to keep the change.</div>'
+      + '  </div>'
+
+      // Note
+      + '  <div class="guide-item">'
+      + '    <div class="guide-icon label-icon">Note</div>'
+      + '    <div class="guide-text">If this chatbox fails, use old one.</div>'
+      + '  </div>'
+
+      + '  <button class="guide-close" id="guide-close" type="button">Close</button>'
+      + '</div>';
+
+    document.body.appendChild(ov);
+
+    // Close handlers
+    document.getElementById('guide-close').addEventListener('click', function(){
+      if (ov.parentNode) ov.parentNode.removeChild(ov);
+    });
+    ov.addEventListener('click', function(e){
+      if (e.target === ov) {
+        if (ov.parentNode) ov.parentNode.removeChild(ov);
+      }
+    });
+  }
+
   function attachListeners() {
     if (listenersAttached) return;
     if (!overlay) return;
 
     closeBtn.addEventListener('click', closeOverlay);
+    // Guide button
+    var guideBtn = document.getElementById('guide-btn');
+    if (guideBtn) {
+      guideBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        showGuide();
+      });
+    }
     overlay.addEventListener('click', function(e){
       if (e.target === overlay) closeOverlay();
     });
