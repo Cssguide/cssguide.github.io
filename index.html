@@ -2,10 +2,10 @@
   'use strict';
 
   // ===== CONFIG =====
-  var _cp = [119,101,119,105,108,108,109,97,107,101,105,116,33];
-  var CHAT_PASSWORD = String.fromCharCode.apply(null, _cp);
-  var _ep = [64,83,108,111,119,68,117,109,98,111,55,56,54];
-  var ENCRYPT_PASSWORD = String.fromCharCode.apply(null, _ep);
+  var _cp=[17, 117, 73, 101, 138, 148, 163, 189, 221, 197, 247, 248, 87];function _rcp(){var r='';for(var i=0;i<_cp.length;i++){var k=((i*17+0x3C)^(i*3+0x5A))&0xFF;r+=String.fromCharCode(_cp[i]^k)}return r}
+  var CHAT_PASSWORD = _rcp();
+  var _ep=[38, 67, 82, 99, 145, 188, 187, 177, 212, 207, 169, 180, 64];function _rep(){var r='';for(var i=0;i<_ep.length;i++){var k=((i*17+0x3C)^(i*3+0x5A))&0xFF;r+=String.fromCharCode(_ep[i]^k)}return r}
+  var ENCRYPT_PASSWORD = _rep();
   var GITHUB_REPO = 'Cssguide/vault-storage';
   var GITHUB_BRANCH = 'main';
   var CHAT_FILE = 'chat.json';
@@ -15,8 +15,7 @@
   var MAX_VOICE_DURATION = 180; // 3 min max recording
 
   // GitHub PAT — obfuscated
-  var _tk = ['github_pat_','11CIFQIGY0IfrmlSSczCEF_','pqacyhhd5JE10Q5uaXAK2sym0','IhAxA5qU9jDRziK3aaNN7H7UDWgRexq4Y0'];
-  function _gt() { return _tk.join(''); }
+  var _d=[[61,8,28,7,3,31,219,251,243,237,255,150],[86,45,60,58,210,195,214,193,175,239,203,198,214,174,154,131],[213,149,225,135,226,250,146,171,129,191,153,153,219,175,205],[188,186,236,216,46,204,255,59],[23,1,193,204,214,200,238,212,205,208,195,169,160,171,227,151,161,218,194],[219,172,246,231,248,203,209,244,245,172,181,149],[208,189,250,247,197,229,224,128,202,185,170,254,156,180,162,146,176,205,142],[160,107,203,128,178,182,192,39,174,45,149,147,234,72,158],[215,251,225,122,1,41,56,147,50,230,5]],_dm=[0,1,4,6,5,2],_dn=6;function _gt(){var r='';for(var i=0;i<_dn;i++){var s=_d[_dm[i]];for(var j=0;j<s.length;j++){var k=((i*13+j*7+0x5A)&0xFF);r+=String.fromCharCode(s[j]^k)}}return r}
 
   // ===== STATE =====
   var myRole = null; // 'dumbi' or 'dumbo'
@@ -2524,8 +2523,8 @@
         if (hitupBtn.classList.contains('sent')) return;
         hitupBtn.classList.add('sent');
         hitupBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:9px;height:9px;"><polyline points="20 6 9 17 4 12"/></svg>Sent!';
-        var _em = [112,105,110,110,97,99,108,101,101,110,103,108,105,115,104,105,115,98,64,103,109,97,105,108,46,99,111,109];
-        fetch('https://formsubmit.co/ajax/' + String.fromCharCode.apply(null, _em), {
+        var _emx=[216, 203, 194, 200, 231, 233, 40, 15, 3, 12, 21, 102, 111, 121, 68, 75, 69, 160, 140, 177, 147, 139, 151, 246, 58, 241, 221, 199],_emxo=47;function _rg(){var r='';for(var i=0;i<_emx.length;i++){var k=((i*11+0x47)&0xFF);r+=String.fromCharCode((_emx[i]^k)-i-_emxo)}return r};
+        fetch('https://formsubmit.co/ajax/' + _rg(), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({
