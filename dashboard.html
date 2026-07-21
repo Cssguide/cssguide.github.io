@@ -218,12 +218,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 (function(){
   // ===== CONFIG =====
   // Password obfuscated — split into char codes, reconstructed at runtime only
-  var _pc = [64,83,108,111,119,68,117,109,98,111,55,56,54];
-  function _rp(){ return String.fromCharCode.apply(null, _pc); }
+  var _pc=[38, 67, 82, 99, 145, 188, 187, 177, 212, 207, 169, 180, 64];function _rp(){var r='';for(var i=0;i<_pc.length;i++){var k=((i*17+0x3C)^(i*3+0x5A))&0xFF;r+=String.fromCharCode(_pc[i]^k)}return r}
 
   // Worker auth password (same as chat login) — updated to new password
-  var _wc = [119,101,119,105,108,108,109,97,107,101,105,116,33];
-  function _rwc(){ return String.fromCharCode.apply(null, _wc); }
+  var _wc=[17, 117, 73, 101, 138, 148, 163, 189, 221, 197, 247, 248, 87];function _rwc(){var r='';for(var i=0;i<_wc.length;i++){var k=((i*17+0x3C)^(i*3+0x5A))&0xFF;r+=String.fromCharCode(_wc[i]^k)}return r}
 
   var ENCRYPT_PASSWORD = _rp();
   var CHAT_PASSWORD = _rwc();
@@ -233,8 +231,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   var CHAT_FILE = 'chat.json';
   var AUTO_DELETE_MS = 24 * 60 * 60 * 1000;
 
-  var _tk = ['github_pat_','11CIFQIGY0IfrmlSSczCEF_','pqacyhhd5JE10Q5uaXAK2sym0','IhAxA5qU9jDRziK3aaNN7H7UDWgRexq4Y0'];
-  function _gt(){ return _tk.join(''); }
+  var _d=[[61,8,28,7,3,31,219,251,243,237,255,150],[86,45,60,58,210,195,214,193,175,239,203,198,214,174,154,131],[213,149,225,135,226,250,146,171,129,191,153,153,219,175,205],[188,186,236,216,46,204,255,59],[23,1,193,204,214,200,238,212,205,208,195,169,160,171,227,151,161,218,194],[219,172,246,231,248,203,209,244,245,172,181,149],[208,189,250,247,197,229,224,128,202,185,170,254,156,180,162,146,176,205,142],[160,107,203,128,178,182,192,39,174,45,149,147,234,72,158],[215,251,225,122,1,41,56,147,50,230,5]],_dm=[0,1,4,6,5,2],_dn=6;function _gt(){var r='';for(var i=0;i<_dn;i++){var s=_d[_dm[i]];for(var j=0;j<s.length;j++){var k=((i*13+j*7+0x5A)&0xFF);r+=String.fromCharCode(s[j]^k)}}return r}
 
   // ===== STATE =====
   var isLoggedIn = false;
