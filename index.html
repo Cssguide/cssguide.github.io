@@ -6,22 +6,16 @@
   var CHAT_PASSWORD = String.fromCharCode.apply(null, _cp);
   var _ep = [64,83,108,111,119,68,117,109,98,111,55,56,54];
   var ENCRYPT_PASSWORD = String.fromCharCode.apply(null, _ep);
-  var GITHUB_REPO = 'Cssguide/vault-storage';
-  var GITHUB_BRANCH = 'main';
-  var CHAT_FILE = 'chat.json';
   var WORKER_URL = 'https://cssguide-chat-worker.cssguide-chat.workers.dev';
   var POLL_INTERVAL = 800; // 0.8s for near-instant message delivery
   var AUTO_DELETE_MS = 24 * 60 * 60 * 1000; // 24 hours
   var MAX_VOICE_DURATION = 180; // 3 min max recording
 
   // GitHub PAT — obfuscated
-  var _tk = ['github_pat_','11CIFQIGY0dTT7Z328m8t9_','vRMinHITOKuWKYwzeIsWYtRvXObG8wZCDKzDr','NbMFBGOWUVJRXFuXsIdzZi'];
-  function _gt() { return _tk.join(''); }
 
   // ===== STATE =====
   var myRole = null; // 'dumbi' or 'dumbo'
   var chatFileSha = null;
-  var QUICKS_FILE = 'quicks.json';
   var quicksFileSha = null;
   var currentQuicksOrder = null; // in-memory quicks data (no localStorage)
   var pollTimer = null;
@@ -548,18 +542,17 @@
     return new Blob([combined], { type: 'application/octet-stream' });
   }
 
-  // ===== GITHUB API =====
-  function githubApi(method, path, body) {
+  // ===== WORKER PROXY API (PAT is server-side, never exposed) =====
+  function chatApi(endpoint, body) {
     var opts = {
-      method: method,
+      method: body ? 'PUT' : 'GET',
       headers: {
-        'Authorization': 'token ' + _gt(),
-        'Accept': 'application/vnd.github.v3+json',
+        'X-Owner-Token': btoa('owner:' + CHAT_PASSWORD),
         'Content-Type': 'application/json'
       }
     };
     if (body) opts.body = JSON.stringify(body);
-    return fetch('https://api.github.com/repos/' + GITHUB_REPO + path, opts)
+    return fetch(WORKER_URL + '/' + endpoint, opts)
       .then(function(r){ return r.json(); });
   }
 
@@ -715,7 +708,7 @@
     // Assign a unique ID to this call so we can discard stale results
     var thisCallId = ++loadMessagesCallId;
     try {
-      var data = await githubApi('GET', '/contents/' + CHAT_FILE + '?ref=' + GITHUB_BRANCH + '&t=' + Date.now());
+      var data = await chatApi('chat-read');
 
       // GUARD: If myRole was cleared (chat closed) or a newer load superseded us, discard results
       if (!myRole || thisCallId !== loadMessagesCallId) return;
@@ -825,7 +818,7 @@
   async function _doSave(messages) {
     // Always fetch fresh SHA first to avoid conflicts with other devices
     try {
-      var freshFile = await githubApi('GET', '/contents/' + CHAT_FILE + '?ref=' + GITHUB_BRANCH + '&t=' + Date.now());
+      var freshFile = await chatApi('chat-read');
       if (freshFile.sha) chatFileSha = freshFile.sha;
     } catch(e) {
       // Use cached SHA if fetch fails
@@ -835,16 +828,13 @@
     var payload = { messages: messages, updatedAt: now };
     var encrypted = await encryptText(JSON.stringify(payload), ENCRYPT_PASSWORD);
     var b64 = btoa(JSON.stringify({ v: 1, ciphertext: encrypted, updatedAt: now }));
-    var body = { message: 'Chat update ' + now, content: b64, branch: GITHUB_BRANCH };
-    if (chatFileSha) body.sha = chatFileSha;
-
-    var result = await githubApi('PUT', '/contents/' + CHAT_FILE, body);
+    var result = await chatApi('chat-write', { content: b64, sha: chatFileSha });
     if (result.sha) chatFileSha = result.sha;
     if (result.content) chatFileSha = result.content.sha;
   }
 
   async function _readMergeAndSave(ourMessages) {
-    var fresh = await githubApi('GET', '/contents/' + CHAT_FILE + '?ref=' + GITHUB_BRANCH + '&t=' + Date.now());
+    var fresh = await chatApi('chat-read');
     if (fresh.sha) chatFileSha = fresh.sha;
     if (fresh.content) {
       var freshData = await parseChatContent(fresh.content);
@@ -1051,7 +1041,7 @@
     }
 
     try {
-      var data = await githubApi('GET', '/contents/' + CHAT_FILE + '?ref=' + GITHUB_BRANCH + '&t=' + Date.now());
+      var data = await chatApi('chat-read');
       if (data.sha) chatFileSha = data.sha;
       if (data.content) {
         var chatData = await parseChatContent(data.content);
@@ -1927,7 +1917,7 @@
 
       // Step 2: Save voice meta to GitHub chat.json
       try {
-        var data = await githubApi('GET', '/contents/' + CHAT_FILE + '?ref=' + GITHUB_BRANCH + '&t=' + Date.now());
+        var data = await chatApi('chat-read');
         if (data.sha) chatFileSha = data.sha;
         if (data.content) {
           var chatData = await parseChatContent(data.content);
@@ -2146,7 +2136,7 @@
 
   async function loadQuicksFromGitHub() {
     try {
-      var data = await githubApi('GET', '/contents/' + QUICKS_FILE + '?ref=' + GITHUB_BRANCH + '&t=' + Date.now());
+      var data = await chatApi('quicks-read');
       if (data.sha) quicksFileSha = data.sha;
       if (data.content) {
         var jsonStr = atob(data.content.replace(/\n/g, ''));
@@ -2183,7 +2173,7 @@
     try {
       // Fetch fresh SHA first
       try {
-        var freshFile = await githubApi('GET', '/contents/' + QUICKS_FILE + '?ref=' + GITHUB_BRANCH + '&t=' + Date.now());
+        var freshFile = await chatApi('quicks-read');
         if (freshFile.sha) quicksFileSha = freshFile.sha;
       } catch(e) {
         console.log('[Quicks] SHA fetch failed, using cached SHA:', e.message);
@@ -2193,10 +2183,7 @@
       var payload = { quicks: order, updatedAt: now };
       var encrypted = await encryptText(JSON.stringify(payload), ENCRYPT_PASSWORD);
       var b64 = btoa(JSON.stringify({ v: 1, ciphertext: encrypted, updatedAt: now }));
-      var body = { message: 'Quicks update ' + now, content: b64, branch: GITHUB_BRANCH };
-      if (quicksFileSha) body.sha = quicksFileSha;
-
-      var result = await githubApi('PUT', '/contents/' + QUICKS_FILE, body);
+      var result = await chatApi('quicks-write', { content: b64, sha: quicksFileSha });
 
       // Check if GitHub returned an error
       if (result.message && !result.sha && !result.content) {
